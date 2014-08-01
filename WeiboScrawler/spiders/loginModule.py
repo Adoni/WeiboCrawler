@@ -23,17 +23,25 @@ class LoginModule:
 
     def login(self, username, password):
         # 获取一个保存cookie的对象
+        # Get an object to save cookie
         cj = cookielib.LWPCookieJar()
         # 将一个保存cookie对象，和一个HTTP的cookie的处理器绑定
+        # Bind the object to save cookie with a HTTP cookie processor
         cookie_support = urllib2.HTTPCookieProcessor(cj)
         # 创建一个opener，将保存了cookie的http处理器，还有设置一个handler用于处理http的URL的打开
+        # Create an opener to save the HTTP processor, and at the same time set an handler to process http url
         opener = urllib2.build_opener(cookie_support, urllib2.HTTPHandler)
         # 将包含了cookie、http处理器、http的handler的资源和urllib2对象板顶在一起
+        # install this opener in urllib2
         urllib2.install_opener(opener)
 
-        self.get_server_time()
+        # First Step: get the server data to encode the post information (username and password, etc)
         server_data = self.get_server_time()
+
+        # Second Step: encode the post information
         post_data = self.post_encode(username, password, server_data)
+
+        # Third Step: post the data to get response which contains the login url
         req = urllib2.Request(
             url=self.login_url,
             data=post_data,
@@ -41,34 +49,29 @@ class LoginModule:
         )
         result = urllib2.urlopen(req)
         text = result.read()
+
+        # Fourth Step: analyze the response to get login url and cookie will save in cj object automatically
         try:
             login_url = self.get_redirect_data(text)  # 解析重定位结果
             login_data = urllib2.urlopen(login_url).read()
         except Exception as e:
-            print('Login Error!')
-            print(e)
-            return False
+            print('Login Error:'+str(e))
+            return None, False
 
-        print('Data:')
-        print(login_data)
-
+        # Fifth Step: check the login-state
         patt_feedback = 'feedBackUrlCallBack\((.*)\)'
         p = re.compile(patt_feedback, re.MULTILINE)
         feedback = p.search(login_data).group(1)
         feedback_json = json.loads(feedback)
-        if(not feedback_json['result']):
-            return False
+        if not feedback_json['result']:
+            print('Login Error!')
+            return None, False
 
-        temp_url = 'http://weibo.com/u/3623327573/home?wvr=5'
-        req = urllib2.Request(url=temp_url)
-        result = urllib2.urlopen(req)
-        f = open('a.html', 'w')
-        f.write(result.read())
-
+        # Transform the cookie saved in cj object into string
         cs = ['%s=%s' % (c.name, c.value) for c in cj]
         cookie = '; '.join(cs)
         print cookie
-        return True
+        return True, cookie
 
     def get_server_time(self):
         server_data = urllib2.urlopen(self.server_url).read()
@@ -120,10 +123,10 @@ class LoginModule:
 
     def get_password(self, password, server_time, nonce, pubkey):
         rsa_public_key = int(pubkey, 16)
-        key = rsa.PublicKey(rsa_public_key, 65537) #创建公钥
-        message = str(server_time) + '\t' + str(nonce) + '\n' + str(password) #拼接明文js加密文件中得到
-        rsa_password = rsa.encrypt(message, key) #加密
-        post_password = binascii.b2a_hex(rsa_password) #将加密信息转换为16进制。
+        key = rsa.PublicKey(rsa_public_key, 65537)  # 创建公钥
+        message = str(server_time) + '\t' + str(nonce) + '\n' + str(password)  # 拼接明文js加密文件中得到
+        rsa_password = rsa.encrypt(message, key)  # 加密
+        post_password = binascii.b2a_hex(rsa_password)  # 将加密信息转换为16进制。
         return post_password
 
     def get_redirect_data(self, text):
