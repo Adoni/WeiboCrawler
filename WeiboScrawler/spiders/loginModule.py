@@ -17,43 +17,79 @@ class LoginModule:
 class LoginModule:
     def __init__(self):
         print("This is LoginModule")
-        self.serverUrl="http://login.sina.com.cn/sso/prelogin.php?entry=weibo&callback=sinaSSOController.preloginCallBack&su=&rsakt=mod&client=ssologin.js(v1.4.11)&_=1379834957683"
-        self.loginUrl="http://login.sina.com.cn/sso/login.php?client=ssologin.js(v1.4.11)"
-        self.postHeader={'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; rv:24.0) Gecko/20100101 Firefox/24.0'}
-
+        self.server_url = "http://login.sina.com.cn/sso/prelogin.php?entry=weibo&callback=sinaSSOController.preloginCallBack&su=&rsakt=mod&client=ssologin.js(v1.4.11)&_=1379834957683"
+        self.login_url = "http://login.sina.com.cn/sso/login.php?client=ssologin.js(v1.4.11)"
+        self.post_header = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; rv:24.0) Gecko/20100101 Firefox/24.0'}
 
     def login(self, username, password):
-        self.getServerTime()
-        serverData=self.getServerTime()
-        postdata=self.postEncode(username, password, serverData)
-        print(postdata)
+        # 获取一个保存cookie的对象
+        cj = cookielib.LWPCookieJar()
+        # 将一个保存cookie对象，和一个HTTP的cookie的处理器绑定
+        cookie_support = urllib2.HTTPCookieProcessor(cj)
+        # 创建一个opener，将保存了cookie的http处理器，还有设置一个handler用于处理http的URL的打开
+        opener = urllib2.build_opener(cookie_support, urllib2.HTTPHandler)
+        # 将包含了cookie、http处理器、http的handler的资源和urllib2对象板顶在一起
+        urllib2.install_opener(opener)
 
+        self.get_server_time()
+        server_data = self.get_server_time()
+        post_data = self.post_encode(username, password, server_data)
+        req = urllib2.Request(
+            url=self.login_url,
+            data=post_data,
+            headers=self.post_header
+        )
+        result = urllib2.urlopen(req)
+        text = result.read()
+        try:
+            login_url = self.get_redirect_data(text)  # 解析重定位结果
+            login_data = urllib2.urlopen(login_url).read()
+        except Exception as e:
+            print('Login Error!')
+            print(e)
+            return False
 
-    def getServerTime(self):
-        serverData = urllib2.urlopen(self.serverUrl).read()
-        return serverData
+        print('Data:')
+        print(login_data)
 
+        patt_feedback = 'feedBackUrlCallBack\((.*)\)'
+        p = re.compile(patt_feedback, re.MULTILINE)
+        feedback = p.search(login_data).group(1)
+        feedback_json = json.loads(feedback)
+        if(not feedback_json['result']):
+            return False
 
-    def analyzeServerTime(self, data):
+        temp_url = 'http://weibo.com/u/3623327573/home?wvr=5'
+        req = urllib2.Request(url=temp_url)
+        result = urllib2.urlopen(req)
+        f = open('a.html', 'w')
+        f.write(result.read())
+
+        cs = ['%s=%s' % (c.name, c.value) for c in cj]
+        cookie = '; '.join(cs)
+        print cookie
+        return True
+
+    def get_server_time(self):
+        server_data = urllib2.urlopen(self.server_url).read()
+        return server_data
+
+    def analyze_server_time(self, data):
         p = re.compile('\((.*)\)')
-        jsonData = p.search(data).group(1)
-        data = json.loads(jsonData)
-        print(data)
-        serverTime = str(data['servertime'])
+        json_data = p.search(data).group(1)
+        data = json.loads(json_data)
+        server_time = str(data['servertime'])
         nonce = data['nonce']
         pubkey = data['pubkey']#
         rsakv = data['rsakv']#
-        print "Server time is:", serverTime
-        print "Nonce is:", nonce
-        print(nonce)
-        return {'servertime':serverTime, 'nonce':nonce, 'pubkey':pubkey, 'rsakv':rsakv}
 
+        return {'servertime': server_time, 'nonce': nonce, 'pubkey': pubkey, 'rsakv': rsakv}
 
-    def postEncode(self, username, password, serverData):
-        data=self.analyzeServerTime(serverData)
-        encodedUserName=self.get_username(username)#用户名使用base64加密
-        encodedPassWord=self.get_password(password, data['servertime'], data['nonce'], data['pubkey'])#目前密码采用rsa加密
-        postPara = {
+    def post_encode(self, username, password, server_data):
+        data = self.analyze_server_time(server_data)
+        encoded_username = self.get_username(username)  # 用户名使用base64加密
+        encoded_password = self.get_password(password, data['servertime'], data['nonce'], data['pubkey'])#目前密码采用rsa加密
+        post_para = {
             'entry': 'weibo',
             'gateway': '1',
             'from': '',
@@ -62,35 +98,38 @@ class LoginModule:
             'ssosimplelogin': '1',
             'vsnf': '1',
             'vsnval': '',
-            'su': encodedUserName,
+            'su': encoded_username,
             'service': 'miniblog',
             'servertime': data['servertime'],
             'nonce': data['nonce'],
             'pwencode': 'rsa2',
-            'sp': encodedPassWord,
+            'sp': encoded_password,
             'encoding': 'UTF-8',
             'prelt': '115',
             'rsakv': data['rsakv'],
             'url': 'http://weibo.com/ajaxlogin.php?framelogin=1&callback=parent.sinaSSOController.feedBackUrlCallBack',
             'returntype': 'META'
         }
-        postData = urllib.urlencode(postPara)#网络编码
-        return postData
-
+        post_data = urllib.urlencode(post_para)  # 网络编码
+        return post_data
 
     def get_username(self, username):
-        userNameTemp = urllib.quote(username)
-        userNameEncoded = base64.encodestring(userNameTemp)[:-1]
-        return userNameEncoded
+        quote_user_name = urllib.quote(username)
+        user_name_encoded = base64.encodestring(quote_user_name)[:-1]
+        return user_name_encoded
 
+    def get_password(self, password, server_time, nonce, pubkey):
+        rsa_public_key = int(pubkey, 16)
+        key = rsa.PublicKey(rsa_public_key, 65537) #创建公钥
+        message = str(server_time) + '\t' + str(nonce) + '\n' + str(password) #拼接明文js加密文件中得到
+        rsa_password = rsa.encrypt(message, key) #加密
+        post_password = binascii.b2a_hex(rsa_password) #将加密信息转换为16进制。
+        return post_password
 
-    def get_password(self, password, servertime, nonce, pubkey):
-        rsaPublickey = int(pubkey, 16)
-        key = rsa.PublicKey(rsaPublickey, 65537) #创建公钥
-        message = str(servertime) + '\t' + str(nonce) + '\n' + str(password) #拼接明文js加密文件中得到
-        passwd = rsa.encrypt(message, key) #加密
-        passwd = binascii.b2a_hex(passwd) #将加密信息转换为16进制。
-        return passwd
+    def get_redirect_data(self, text):
+        p = re.compile('location\.replace\([\'"](.*?)[\'"]\)')
+        login_url = p.search(text).group(1)
+        return login_url
 
-a=LoginModule()
-a.login("a","")
+a = LoginModule()
+a.login("adoni1203@gmail.com", "9261adoni")
