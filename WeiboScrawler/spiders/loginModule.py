@@ -8,12 +8,6 @@ import base64
 import binascii
 import rsa
 
-
-class LoginModule:
-    def __init__(self):
-        print("This is LoginModule")
-
-
 class LoginModule:
     def __init__(self):
         print("This is LoginModule")
@@ -65,12 +59,15 @@ class LoginModule:
         feedback_json = json.loads(feedback)
         if not feedback_json['result']:
             print('Login Error!')
-            return None, False
+            return False, None
 
         # Transform the cookie saved in cj object into string
-        cs = ['%s=%s' % (c.name, c.value) for c in cj]
-        cookie = '; '.join(cs)
-        print cookie
+        #cs = ['%s=%s' % (c.name, c.value) for c in cj]
+        #cookie = '; '.join(cs)
+
+        cookie=[]
+        for c in cj:
+            cookie.append({'name': c.name, 'value': c.value})
         return True, cookie
 
     def get_server_time(self):
@@ -133,6 +130,3 @@ class LoginModule:
         p = re.compile('location\.replace\([\'"](.*?)[\'"]\)')
         login_url = p.search(text).group(1)
         return login_url
-
-a = LoginModule()
-a.login("adoni1203@gmail.com", "9261adoni")
