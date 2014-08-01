@@ -2,10 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="a5df9738-8e4b-49d6-ba15-33735c2862db" name="Default" comment="">
-      <change type="DELETED" beforePath="$PROJECT_DIR$/a.html" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/README.md" afterPath="$PROJECT_DIR$/README.md" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/WeiboScrawler/spiders/a.html" afterPath="$PROJECT_DIR$/WeiboScrawler/spiders/a.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/WeiboScrawler/spiders/loginModule.py" afterPath="$PROJECT_DIR$/WeiboScrawler/spiders/loginModule.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
     <ignored path="WeiboCrawler.iws" />
     <ignored path=".idea/workspace.xml" />

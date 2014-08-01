@@ -7,6 +7,7 @@ from loginModule import LoginModule
 import re
 import os
 import json
+from render import Render
 
 
 class BaseWeiboSpider(Spider):
@@ -24,9 +25,18 @@ class BaseWeiboSpider(Spider):
         self.cookie=result[1]
 
     def simple_parse(self,response):
-        sel=Selector(response)
-        all_news=sel.xpath('//div[@class="WB_feed"]//div').extract()
-        print(len(all_news))
+        f=open('a.html','w')
+        f.write(response.body)
+        f.close()
+        #sel=Selector(response)
+        #all_news=sel.xpath('//div[@class="WB_feed"]//div').extract()
+        #print(len(all_news))
+        url = './a.html'
+        r = Render(url)
+        html = r.frame.toHtml().toUtf8()
+        f=open('b.html','w')
+        f.write(html)
+        f.close()
 
     def start_requests(self):
         yield Request(url='http://weibo.com/u/3623327573/home?wvr=5',
