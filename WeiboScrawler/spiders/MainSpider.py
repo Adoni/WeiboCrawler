@@ -33,13 +33,16 @@ class BaseWeiboSpider(Spider):
         #print(len(all_news))
         url = './a.html'
         r = Render(url)
-        html = r.frame.toHtml().toUtf8()
+        html = str(r.frame.toHtml().toUtf8())
+        sel=Selector(text=html)
         f=open('b.html','w')
+        all_news=sel.xpath('//div[@class="WB_feed WB_feed_self"]//div').extract()
+        print(len(all_news))
         f.write(html)
         f.close()
 
     def start_requests(self):
-        yield Request(url='http://weibo.com/u/3623327573/home?wvr=5',
+        yield Request(url='http://weibo.com/tliu7221',
             cookies=self.cookie,
             callback=self.simple_parse
             )
