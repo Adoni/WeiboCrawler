@@ -28,21 +28,21 @@ class BaseWeiboSpider(Spider):
         f=open('a.html','w')
         f.write(response.body)
         f.close()
-        #sel=Selector(response)
-        #all_news=sel.xpath('//div[@class="WB_feed"]//div').extract()
-        #print(len(all_news))
-        url = './a.html'
         r = Render(response.body)
-        html = str(r.frame.toHtml().toUtf8())
+        html = r.frame.toHtml()
+        html=unicode(html,'utf-8','ignore').encode('utf-8')
+        print(type(html))
         sel=Selector(text=html)
-        f=open('b.html','w')
         all_news=sel.xpath('//div[@class="WB_feed WB_feed_self"]//div').extract()
         print(len(all_news))
+        f=open('b.html','w')
         f.write(html)
         f.close()
 
     def start_requests(self):
-        yield Request(url='http://weibo.com/tliu7221',
-            cookies=self.cookie,
-            callback=self.simple_parse
+        start_url='http://weibo.com/p/1005052337295450/weibo?from=page_100505_home&wvr=5.1&mod=weibomore#3507560357470567'
+        yield Request(
+                url=start_url,
+                cookies=self.cookie,
+                callback=self.simple_parse
             )
