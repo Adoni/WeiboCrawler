@@ -3,6 +3,7 @@ This is an crawler for Sina Weibo, based on Scrapy.
 ##Dependency
 * pyqt: to parse javascript
 * rsa: to encode when posting
+
 ##Reference：
 ###For login module
 * http://www.douban.com/note/201767245/
