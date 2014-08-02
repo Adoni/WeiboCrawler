@@ -4,6 +4,38 @@ This is an crawler for Sina Weibo, based on Scrapy.
 * pyqt: to parse javascript
 * rsa: to encode when posting
 
+##Install Dependency
+
+###How to install rsa
+
+    pip install rsa
+
+###How to install PyQt
+
+####For Mac
+
+    brew install pyqt
+
+####For Ubuntu
+
+    sudo apt-get install python-pip python2.7-dev libxext-dev python-qt4 qt4-dev-tools build-essential
+    pip install PyQt
+    pip install SIP
+    python2.7 configure.py
+    make
+    sudo make install
+    python2.7 configure.py
+    make
+    sudo make install
+
+####Validation
+
+Excute this code with python:
+
+    from PyQt4 import QtCore, QtGui
+
+If there is no error, we install PyQt successfully. If not, you should visit [this page](http://www.pythoncentral.io/install-pyside-pyqt-on-windows-mac-linux/)
+
 ##Reference：
 ###For login module
 * http://www.douban.com/note/201767245/
