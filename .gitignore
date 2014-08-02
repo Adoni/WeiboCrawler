@@ -11,7 +11,7 @@
 
 # Swap file created by vim #
 ############
-.idea
+.*.swp
 
 
 # Logs and databases #
