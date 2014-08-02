@@ -10,6 +10,7 @@ BOT_NAME = 'WeiboScrawler'
 
 SPIDER_MODULES = ['WeiboScrawler.spiders']
 NEWSPIDER_MODULE = 'WeiboScrawler.spiders'
+DOWNLOAD_DELAY = 40
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
 #USER_AGENT = 'WeiboScrawler (+http://www.yourdomain.com)'
