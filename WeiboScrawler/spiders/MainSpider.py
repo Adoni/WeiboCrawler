@@ -32,7 +32,7 @@ class BaseWeiboSpider(Spider):
         #all_news=sel.xpath('//div[@class="WB_feed"]//div').extract()
         #print(len(all_news))
         url = './a.html'
-        r = Render(url)
+        r = Render(response.body)
         html = str(r.frame.toHtml().toUtf8())
         sel=Selector(text=html)
         f=open('b.html','w')

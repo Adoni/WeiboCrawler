@@ -4,11 +4,18 @@ from PyQt4.QtCore import *
 from PyQt4.QtWebKit import *
 
 class Render(QWebPage):
-  def __init__(self, url):
+  #def __init__(self, url):
+  #  self.app = QApplication(sys.argv)
+  #  QWebPage.__init__(self)
+  #  self.loadFinished.connect(self._loadFinished)
+  #  self.mainFrame().load(QUrl(url))
+  #  self.app.exec_()
+
+  def __init__(self, html):
     self.app = QApplication(sys.argv)
     QWebPage.__init__(self)
     self.loadFinished.connect(self._loadFinished)
-    self.mainFrame().load(QUrl(url))
+    self.mainFrame().setHtml(html)
     self.app.exec_()
 
   def _loadFinished(self, result):

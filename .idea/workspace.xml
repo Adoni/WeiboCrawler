@@ -1,11 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="a5df9738-8e4b-49d6-ba15-33735c2862db" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/WeiboScrawler/spiders/MainSpider.py" afterPath="$PROJECT_DIR$/WeiboScrawler/spiders/MainSpider.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/WeiboScrawler/spiders/a.html" afterPath="$PROJECT_DIR$/WeiboScrawler/spiders/a.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/WeiboScrawler/spiders/b.html" afterPath="$PROJECT_DIR$/WeiboScrawler/spiders/b.html" />
-    </list>
+    <list default="true" id="a5df9738-8e4b-49d6-ba15-33735c2862db" name="Default" comment="" />
     <ignored path="WeiboCrawler.iws" />
     <ignored path=".idea/workspace.xml" />
     <option name="TRACKING_ENABLED" value="true" />
