@@ -1,0 +1,19 @@
+# Compiled result #
+###################
+*.out
+*.pyc
+
+
+# Excuting result #
+###################
+*.data
+
+
+# Swap file created by vim #
+############
+.idea
+
+
+# Logs and databases #
+######################
+*.log
